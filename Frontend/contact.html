@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us — GreenLeaf Tea Factory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green-dark: #1a4a1e; --green-mid: #2d6a31; --green-btn: #1f5c24;
+      --gold: #b8922a; --cream: #f5f0e8;
+      --white: #ffffff; --text-dark: #1a1a1a; --text-muted: #6b7280; --border: #e5e7eb;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text-dark); }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(245,240,232,0.96); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 64px; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo { width: 40px; height: 40px; background: var(--green-mid); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .nav-brand-text .name { font-weight: 600; font-size: 15px; color: var(--text-dark); }
+    .nav-brand-text .tagline { font-size: 11px; color: var(--green-mid); }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--text-dark); font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--green-mid); }
+    .btn-outline-nav { padding: 8px 20px; border: 1.5px solid var(--green-mid); border-radius: 8px; background: transparent; color: var(--green-mid); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .btn-outline-nav:hover { background: var(--green-mid); color: white; }
+
+    /* Page layout */
+    .contact-page { padding: 100px 40px 80px; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+
+    /* Left info */
+    .contact-info .eyebrow { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green-mid); border: 1px solid rgba(45,106,49,0.3); padding: 6px 16px; border-radius: 20px; margin-bottom: 16px; }
+    .contact-info h1 { font-family: 'Playfair Display', serif; font-size: clamp(34px, 4vw, 48px); font-weight: 700; color: var(--green-dark); line-height: 1.15; margin-bottom: 16px; }
+    .contact-info p { font-size: 15px; color: var(--text-muted); line-height: 1.7; margin-bottom: 36px; max-width: 420px; }
+
+    .contact-details { display: flex; flex-direction: column; gap: 16px; margin-bottom: 36px; }
+    .contact-item { display: flex; align-items: flex-start; gap: 14px; }
+    .contact-icon { width: 42px; height: 42px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .contact-label { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
+    .contact-value { font-size: 14px; font-weight: 500; color: var(--text-dark); }
+
+    /* Tabs */
+    .form-tabs { display: flex; gap: 0; margin-bottom: 24px; background: white; border-radius: 12px; padding: 4px; border: 1px solid var(--border); }
+    .tab { flex: 1; padding: 10px; border: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: 8px; color: var(--text-muted); transition: all 0.2s; }
+    .tab.active { background: var(--green-btn); color: white; }
+
+    .form-card { background: white; border-radius: 20px; padding: 32px; box-shadow: 0 8px 40px rgba(0,0,0,0.08); border: 1px solid var(--border); }
+    .form-panel { display: none; }
+    .form-panel.active { display: block; }
+    .form-panel h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .form-panel .subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #374151; margin-bottom: 6px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-dark);
+      background: #fafafa; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: #9ca3af; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--green-mid); box-shadow: 0 0 0 3px rgba(45,106,49,0.1); background: white;
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .select-wrap { position: relative; }
+    .select-wrap::after { content: ''; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid #9ca3af; pointer-events: none; }
+    .select-wrap select { appearance: none; cursor: pointer; }
+
+    .btn-submit { width: 100%; padding: 14px; background: var(--green-btn); color: white; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.25s; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-submit:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(31,92,36,0.3); }
+    .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+    .spinner { display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .success-state { display: none; text-align: center; padding: 32px 0; }
+    .success-icon { width: 60px; height: 60px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px; }
+    .success-state h3 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--green-dark); margin-bottom: 8px; }
+    .success-state p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+    .btn-reset { padding: 10px 24px; background: transparent; border: 1.5px solid var(--green-mid); color: var(--green-mid); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-reset:hover { background: var(--green-mid); color: white; }
+
+    .error-msg { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #dc2626; margin-bottom: 16px; display: none; }
+    .error-msg.visible { display: block; }
+
+    @media (max-width: 900px) {
+      .contact-page { grid-template-columns: 1fr; gap: 40px; padding: 90px 20px 60px; }
+      nav { padding: 0 20px; } .nav-links { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-brand">
+      <div class="nav-logo">🍃</div>
+      <div class="nav-brand-text">
+        <div class="name">GreenLeaf Tea Factory</div>
+        <div class="tagline">Premium Ceylon Tea Since 2014</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="contact.html" class="active">Contact</a></li>
+    </ul>
+    <a href="login.html" class="btn-outline-nav">Login</a>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="contact-page">
+
+    <!-- LEFT COLUMN — Info -->
+    <div class="contact-info">
+      <span class="eyebrow">Get in Touch</span>
+      <h1>Let's Talk<br />About Premium Tea</h1>
+      <p>Whether you need wholesale pricing, want to learn about our products, or have a specific inquiry — our team is ready to help.</p>
+
+      <div class="contact-details">
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div class="contact-label">Location</div>
+            <div class="contact-value">Nuwara Eliya, Sri Lanka</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">✉</div>
+          <div>
+            <div class="contact-label">Email</div>
+            <div class="contact-value">info@greenleaf.lk</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <div class="contact-label">Phone</div>
+            <div class="contact-value">+94 52 222 1234</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🕐</div>
+          <div>
+            <div class="contact-label">Business Hours</div>
+            <div class="contact-value">Mon – Fri, 8:00 AM – 5:00 PM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN — Forms -->
+    <div class="form-card">
+      <div class="form-tabs">
+        <button class="tab active" onclick="switchTab('quote', this)">Request a Quote</button>
+        <button class="tab" onclick="switchTab('message', this)">Send a Message</button>
+      </div>
+
+      <!-- Quote form -->
+      <div class="form-panel active" id="panel-quote">
+        <h2>Request a Wholesale Quote</h2>
+        <p class="subtitle">Fill in the details below and we'll send you competitive pricing within 24 hours.</p>
+
+        <div class="error-msg" id="quoteError"></div>
+
+        <form id="quoteForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name *</label>
+              <input type="text" id="q-name" placeholder="Your full name" required />
+            </div>
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" id="q-email" placeholder="your@email.com" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" id="q-phone" placeholder="+94 7X XXX XXXX" />
+            </div>
+            <div class="form-group">
+              <label>Quantity (KG)</label>
+              <input type="number" id="q-qty" placeholder="e.g. 500" min="1" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Product Interest *</label>
+            <div class="select-wrap">
+              <select id="q-product" required>
+                <option value="" disabled selected>Select a product…</option>
+                <option>Black Tea (BOP Grade)</option>
+                <option>Green Tea (Gunpowder)</option>
+                <option>White Tea (Silver Tips)</option>
+                <option>Oolong Tea</option>
+                <option>Flavoured Tea Blends</option>
+                <option>Other / Custom Blend</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Additional Notes</label>
+            <textarea id="q-notes" placeholder="Any specific requirements, packaging preferences…"></textarea>
+          </div>
+          <button type="submit" class="btn-submit" id="quoteSend">
+            <span>Submit Quote Request</span>
+            <span class="spinner" id="qSpinner"></span>
+          </button>
+        </form>
+
+        <div class="success-state" id="quoteSuccess">
+          <div class="success-icon">✓</div>
+          <h3>Quote Request Submitted!</h3>
+          <p>Thank you! Our team will get back to you within 24 hours with pricing and availability.</p>
+          <button class="btn-reset" onclick="resetQuote()">Submit Another</button>
+        </div>
+      </div>
+
+      <!-- Message form -->
+      <div class="form-panel" id="panel-message">
+        <h2>Send Us a Message</h2>
+        <p class="subtitle">Have a general inquiry? We'd love to hear from you.</p>
+
+        <div class="error-msg" id="msgError"></div>
+
+        <form id="msgForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name *</label>
+              <input type="text" id="m-name" placeholder="Your full name" required />
+            </div>
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" id="m-email" placeholder="your@email.com" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Subject *</label>
+            <input type="text" id="m-subject" placeholder="What is your message about?" required />
+          </div>
+          <div class="form-group">
+            <label>Message *</label>
+            <textarea id="m-body" placeholder="Write your message here…" style="min-height:130px" required></textarea>
+          </div>
+          <button type="submit" class="btn-submit" id="msgSend">
+            <span>Send Message</span>
+            <span class="spinner" id="mSpinner"></span>
+          </button>
+        </form>
+
+        <div class="success-state" id="msgSuccess">
+          <div class="success-icon">✉</div>
+          <h3>Message Sent!</h3>
+          <p>Thank you for reaching out. We'll reply to your message as soon as possible.</p>
+          <button class="btn-reset" onclick="resetMsg()">Send Another</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:5037/api';
+
+    // Pre-fill product from URL param
+    const params = new URLSearchParams(location.search);
+    const preProduct = params.get('product');
+    if (preProduct) {
+      const sel = document.getElementById('q-product');
+      for (const opt of sel.options) {
+        if (opt.text === preProduct || opt.value === preProduct) { opt.selected = true; break; }
+      }
+    }
+
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`panel-${name}`).classList.add('active');
+    }
+
+    function showError(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.classList.add('visible');
+    }
+    function clearError(id) { document.getElementById(id).classList.remove('visible'); }
+
+    // ── Quote form ──
+    document.getElementById('quoteForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError('quoteError');
+      const name    = document.getElementById('q-name').value.trim();
+      const email   = document.getElementById('q-email').value.trim();
+      const product = document.getElementById('q-product').value;
+      const qty     = parseInt(document.getElementById('q-qty').value) || 0;
+      const phone   = document.getElementById('q-phone').value.trim();
+      const notes   = document.getElementById('q-notes').value.trim();
+
+      if (!name || !email || !product) { showError('quoteError', 'Please fill in all required fields.'); return; }
+
+      const btn = document.getElementById('quoteSend');
+      btn.disabled = true;
+      document.getElementById('qSpinner').style.display = 'block';
+
+      try {
+        const res = await fetch(`${API}/quoterequests`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customerName: name, email, phone, quantityKg: qty, notes, productId: product }),
+        });
+        if (!res.ok) throw new Error('Failed to submit.');
+        document.getElementById('quoteForm').style.display = 'none';
+        document.getElementById('quoteSuccess').style.display = 'block';
+      } catch {
+        showError('quoteError', 'Something went wrong. Please try again.');
+      } finally {
+        btn.disabled = false;
+        document.getElementById('qSpinner').style.display = 'none';
+      }
+    });
+
+    function resetQuote() {
+      document.getElementById('quoteForm').reset();
+      document.getElementById('quoteForm').style.display = 'block';
+      document.getElementById('quoteSuccess').style.display = 'none';
+    }
+
+    // ── Message form ──
+    document.getElementById('msgForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError('msgError');
+      const name    = document.getElementById('m-name').value.trim();
+      const email   = document.getElementById('m-email').value.trim();
+      const subject = document.getElementById('m-subject').value.trim();
+      const body    = document.getElementById('m-body').value.trim();
+
+      if (!name || !email || !subject || !body) { showError('msgError', 'Please fill in all required fields.'); return; }
+
+      const btn = document.getElementById('msgSend');
+      btn.disabled = true;
+      document.getElementById('mSpinner').style.display = 'block';
+
+      try {
+        const res = await fetch(`${API}/contactmessages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ senderName: name, email, subject, body }),
+        });
+        if (!res.ok) throw new Error('Failed to send.');
+        document.getElementById('msgForm').style.display = 'none';
+        document.getElementById('msgSuccess').style.display = 'block';
+      } catch {
+        showError('msgError', 'Something went wrong. Please try again.');
+      } finally {
+        btn.disabled = false;
+        document.getElementById('mSpinner').style.display = 'none';
+      }
+    });
+
+    function resetMsg() {
+      document.getElementById('msgForm').reset();
+      document.getElementById('msgForm').style.display = 'block';
+      document.getElementById('msgSuccess').style.display = 'none';
+    }
+  </script>
+</body>
+</html>

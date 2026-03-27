@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Products — GreenLeaf Tea Factory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green-dark: #1a4a1e; --green-mid: #2d6a31; --green-btn: #1f5c24;
+      --gold: #b8922a; --gold-light: #d4a84b; --cream: #f5f0e8;
+      --white: #ffffff; --text-dark: #1a1a1a; --text-muted: #6b7280; --border: #e5e7eb;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text-dark); }
+
+    /* Nav */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(245,240,232,0.96); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 64px; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo { width: 40px; height: 40px; background: var(--green-mid); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .nav-brand-text .name { font-weight: 600; font-size: 15px; color: var(--text-dark); }
+    .nav-brand-text .tagline { font-size: 11px; color: var(--green-mid); }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--text-dark); font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--green-mid); }
+    .nav-actions { display: flex; gap: 10px; }
+    .btn-outline { padding: 8px 20px; border: 1.5px solid var(--green-mid); border-radius: 8px; background: transparent; color: var(--green-mid); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .btn-outline:hover { background: var(--green-mid); color: white; }
+    .btn-solid { padding: 8px 20px; border: 1.5px solid var(--green-btn); border-radius: 8px; background: var(--green-btn); color: white; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .btn-solid:hover { background: var(--green-dark); }
+
+    /* Hero */
+    .page-hero { padding: 120px 40px 60px; text-align: center; }
+    .page-hero .eyebrow { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green-mid); border: 1px solid rgba(45,106,49,0.3); padding: 6px 16px; border-radius: 20px; margin-bottom: 16px; }
+    .page-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 5vw, 54px); font-weight: 700; color: var(--green-dark); line-height: 1.15; margin-bottom: 16px; }
+    .page-hero p { font-size: 16px; color: var(--text-muted); max-width: 520px; margin: 0 auto; line-height: 1.7; }
+
+    /* Filter bar */
+    .filter-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 0 40px; margin-bottom: 36px; justify-content: center; }
+    .filter-btn { padding: 8px 20px; border-radius: 24px; border: 1.5px solid var(--border); background: white; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+    .filter-btn:hover, .filter-btn.active { background: var(--green-mid); border-color: var(--green-mid); color: white; }
+
+    /* Products grid */
+    .products-section { padding: 0 40px 80px; max-width: 1280px; margin: 0 auto; }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+
+    .product-card {
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: transform 0.25s, box-shadow 0.25s;
+      display: flex; flex-direction: column;
+    }
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.1); }
+
+    .product-img {
+      height: 180px;
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 64px;
+      position: relative;
+      overflow: hidden;
+    }
+    .product-img img { width: 100%; height: 100%; object-fit: cover; }
+    .product-badge-tag {
+      position: absolute; top: 12px; left: 12px;
+      background: var(--gold);
+      color: white;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 20px;
+    }
+    .unavailable-tag {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 14px; font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .product-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+    .product-cat { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--green-mid); margin-bottom: 6px; }
+    .product-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+    .product-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; flex: 1; }
+    .product-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid var(--border); }
+    .product-price { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--green-dark); }
+    .product-price span { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--text-muted); font-weight: 400; }
+    .btn-quote { padding: 8px 16px; background: var(--green-btn); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-quote:hover { background: var(--green-dark); }
+
+    /* Loading / empty */
+    .grid-loader { text-align: center; padding: 60px; color: var(--text-muted); grid-column: 1/-1; }
+    .grid-loader .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--green-mid); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--green-dark); color: white; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 300; transform: translateY(80px); opacity: 0; transition: all 0.3s; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; } .nav-links { display: none; }
+      .page-hero, .products-section { padding-left: 20px; padding-right: 20px; }
+      .filter-bar { padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-brand">
+      <div class="nav-logo">🍃</div>
+      <div class="nav-brand-text">
+        <div class="name">GreenLeaf Tea Factory</div>
+        <div class="tagline">Premium Ceylon Tea Since 2014</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html" class="active">Products</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="login.html" class="btn-outline">Login</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="page-hero">
+    <span class="eyebrow">Our Collection</span>
+    <h1>Premium Ceylon Tea<br />Straight from the Source</h1>
+    <p>Explore our range of handcrafted teas — from robust black teas to delicate white teas — all grown in Sri Lanka's finest estates.</p>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" data-cat="all" onclick="filterByCategory('all', this)">All Products</button>
+    <!-- Dynamic categories injected -->
+  </div>
+
+  <!-- PRODUCTS GRID -->
+  <div class="products-section">
+    <div class="products-grid" id="productsGrid">
+      <div class="grid-loader">
+        <div class="spinner"></div>
+        <p>Loading products…</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API = 'http://localhost:5037/api';
+    let allProducts = [];
+    let currentCat = 'all';
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    // Tea icons by category
+    const catIcons = {
+      'Black Tea': '🫖', 'Green Tea': '🍵', 'White Tea': '☕',
+      'Oolong Tea': '🌿', 'Herbal': '🌸', default: '🍃'
+    };
+
+    async function loadProducts() {
+      try {
+        const res = await fetch(`${API}/products`);
+        allProducts = await res.json();
+
+        // Populate category filters
+        const cats = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
+        const bar = document.getElementById('filterBar');
+        cats.forEach(cat => {
+          const btn = document.createElement('button');
+          btn.className = 'filter-btn';
+          btn.dataset.cat = cat;
+          btn.textContent = cat;
+          btn.onclick = () => filterByCategory(cat, btn);
+          bar.appendChild(btn);
+        });
+
+        renderProducts(allProducts);
+      } catch (e) {
+        document.getElementById('productsGrid').innerHTML =
+          '<div class="grid-loader"><p>⚠ Failed to load products. Please try again later.</p></div>';
+      }
+    }
+
+    function filterByCategory(cat, btn) {
+      currentCat = cat;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filtered = cat === 'all' ? allProducts : allProducts.filter(p => p.category === cat);
+      renderProducts(filtered);
+    }
+
+    function renderProducts(list) {
+      const active = list.filter(p => p.isActive !== false);
+      const grid = document.getElementById('productsGrid');
+      if (!active.length) {
+        grid.innerHTML = '<div class="grid-loader"><p>No products found in this category.</p></div>';
+        return;
+      }
+      grid.innerHTML = active.map(p => {
+        const icon = catIcons[p.category] || catIcons.default;
+        const imgEl = p.imageUrl
+          ? `<img src="${p.imageUrl}" alt="${p.name}" onerror="this.parentElement.innerHTML='<span style=font-size:64px>${icon}</span>'" />`
+          : `<span style="font-size:64px">${icon}</span>`;
+        return `<div class="product-card" data-id="${p.id}">
+          <div class="product-img">
+            ${imgEl}
+            ${p.badge ? `<span class="product-badge-tag">${p.badge}</span>` : ''}
+            ${!p.isAvailable ? '<div class="unavailable-tag">Out of Stock</div>' : ''}
+          </div>
+          <div class="product-body">
+            <div class="product-cat">${p.category || 'Tea'}</div>
+            <div class="product-name">${p.name}</div>
+            <div class="product-desc">${p.description || 'Premium quality Ceylon tea, carefully processed for exceptional taste and aroma.'}</div>
+            <div class="product-footer">
+              <div class="product-price">
+                LKR ${Number(p.pricePerKg || 0).toFixed(2)}<span> / KG</span>
+              </div>
+              ${p.isAvailable
+                ? `<button class="btn-quote" onclick="requestQuote('${p.name}')">Request Quote</button>`
+                : `<span style="font-size:12px;color:#9ca3af">Not available</span>`
+              }
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function requestQuote(productName) {
+      window.location.href = `contact.html?product=${encodeURIComponent(productName)}`;
+    }
+
+    loadProducts();
+  </script>
+</body>
+</html>
