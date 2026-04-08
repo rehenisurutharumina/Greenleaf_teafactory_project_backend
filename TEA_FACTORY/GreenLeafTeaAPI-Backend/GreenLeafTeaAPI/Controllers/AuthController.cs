@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace GreenLeafTeaAPI.Controllers
 {
@@ -26,7 +24,7 @@ namespace GreenLeafTeaAPI.Controllers
 
         // -------------------------------------------------------
         // POST /api/auth/register
-        // Creates a new customer/staff account
+        // Creates a new customer account (public registration)
         // -------------------------------------------------------
         [HttpPost("register")]
         public async Task<ActionResult<AuthResponseDto>> Register([FromBody] RegisterDto dto)
@@ -46,16 +44,9 @@ namespace GreenLeafTeaAPI.Controllers
                 return ValidationProblem(ModelState);
             }
 
-            var requestedRole = dto.Role?.Trim();
-            var roleName = string.IsNullOrWhiteSpace(requestedRole) ? "Customer" : requestedRole;
-
-            // Public registration is limited to Customer or Staff accounts.
-            if (!roleName.Equals("Customer", StringComparison.OrdinalIgnoreCase) &&
-                !roleName.Equals("Staff", StringComparison.OrdinalIgnoreCase))
-            {
-                ModelState.AddModelError(nameof(dto.Role), "Role must be either Customer or Staff.");
-                return ValidationProblem(ModelState);
-            }
+            // Public registration always creates a Customer account.
+            // Staff and Admin accounts are created via the admin panel only.
+            var roleName = "Customer";
 
             var targetRole = await _context.Roles
                 .FirstOrDefaultAsync(r => r.Name == roleName);
@@ -69,7 +60,7 @@ namespace GreenLeafTeaAPI.Controllers
             {
                 FullName = dto.FullName.Trim(),
                 Email = email,
-                PasswordHash = HashPassword(dto.Password),
+                PasswordHash = PasswordHelper.Hash(dto.Password),
                 Phone = dto.Phone?.Trim(),
                 Address = dto.Address?.Trim(),
                 RoleId = targetRole.Id,
@@ -108,7 +99,7 @@ namespace GreenLeafTeaAPI.Controllers
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Email == email);
 
-            if (user == null || !VerifyPassword(dto.Password, user.PasswordHash))
+            if (user == null || !PasswordHelper.Verify(dto.Password, user.PasswordHash))
             {
                 return Unauthorized(new { message = "Invalid email or password." });
             }
@@ -137,7 +128,7 @@ namespace GreenLeafTeaAPI.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == null)
-                return Unauthorized();
+                return Unauthorized(new { message = "Invalid token." });
 
             var user = await _context.Users
                 .Include(u => u.Role)
@@ -159,7 +150,7 @@ namespace GreenLeafTeaAPI.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == null)
-                return Unauthorized();
+                return Unauthorized(new { message = "Invalid token." });
 
             var user = await _context.Users
                 .Include(u => u.Role)
@@ -192,49 +183,22 @@ namespace GreenLeafTeaAPI.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == null)
-                return Unauthorized();
+                return Unauthorized(new { message = "Invalid token." });
 
             var user = await _context.Users.FindAsync(userId.Value);
             if (user == null)
-                return NotFound();
+                return NotFound(new { message = "User not found." });
 
-            if (!VerifyPassword(dto.CurrentPassword, user.PasswordHash))
+            if (!PasswordHelper.Verify(dto.CurrentPassword, user.PasswordHash))
             {
                 ModelState.AddModelError(nameof(dto.CurrentPassword), "Current password is incorrect.");
                 return ValidationProblem(ModelState);
             }
 
-            user.PasswordHash = HashPassword(dto.NewPassword);
+            user.PasswordHash = PasswordHelper.Hash(dto.NewPassword);
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Password changed successfully." });
-        }
-
-        // -------------------------------------------------------
-        // Helper: Hash password using HMACSHA512
-        // -------------------------------------------------------
-        private static string HashPassword(string password)
-        {
-            using var hmac = new HMACSHA512();
-            var salt = hmac.Key;
-            var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-            // Store salt:hash as base64
-            return Convert.ToBase64String(salt) + ":" + Convert.ToBase64String(hash);
-        }
-
-        private static bool VerifyPassword(string password, string storedHash)
-        {
-            var parts = storedHash.Split(':');
-            if (parts.Length != 2)
-                return false;
-
-            var salt = Convert.FromBase64String(parts[0]);
-            var hash = Convert.FromBase64String(parts[1]);
-
-            using var hmac = new HMACSHA512(salt);
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-            return computedHash.SequenceEqual(hash);
         }
 
         // -------------------------------------------------------

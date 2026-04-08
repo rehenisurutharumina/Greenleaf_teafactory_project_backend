@@ -1,12 +1,10 @@
 using GreenLeafTeaAPI.Data;
 using GreenLeafTeaAPI.DTOs;
-using GreenLeafTeaAPI.DTOs.Auth;
 using GreenLeafTeaAPI.Models;
+using GreenLeafTeaAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace GreenLeafTeaAPI.Controllers
 {
@@ -53,6 +51,9 @@ namespace GreenLeafTeaAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] AdminCreateUserDto dto)
         {
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
+
             var email = dto.Email.Trim().ToLowerInvariant();
 
             if (await _context.Users.AnyAsync(u => u.Email == email))
@@ -66,7 +67,7 @@ namespace GreenLeafTeaAPI.Controllers
             {
                 FullName = dto.FullName.Trim(),
                 Email = email,
-                PasswordHash = HashPassword(dto.Password),
+                PasswordHash = PasswordHelper.Hash(dto.Password),
                 Phone = dto.Phone?.Trim(),
                 RoleId = role.Id,
                 IsActive = true,
@@ -95,7 +96,7 @@ namespace GreenLeafTeaAPI.Controllers
         }
 
         /// <summary>
-        /// DELETE /api/users/{id} — Delete user
+        /// DELETE /api/users/{id} — Soft-delete user (deactivate)
         /// </summary>
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
@@ -103,27 +104,10 @@ namespace GreenLeafTeaAPI.Controllers
             var user = await _context.Users.FindAsync(id);
             if (user == null) return NotFound(new { message = "User not found." });
 
-            _context.Users.Remove(user);
+            user.IsActive = false;
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "User deleted." });
+            return Ok(new { message = "User deactivated." });
         }
-
-        private static string HashPassword(string password)
-        {
-            using var hmac = new HMACSHA512();
-            var salt = hmac.Key;
-            var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(salt) + ":" + Convert.ToBase64String(hash);
-        }
-    }
-
-    public class AdminCreateUserDto
-    {
-        public string FullName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string? Phone { get; set; }
-        public string Role { get; set; } = "Customer";
     }
 }

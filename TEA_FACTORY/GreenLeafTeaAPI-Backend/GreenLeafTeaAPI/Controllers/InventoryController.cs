@@ -43,7 +43,7 @@ namespace GreenLeafTeaAPI.Controllers
         }
 
         /// <summary>
-        /// PUT /api/inventory/{id} — Update stock quantity
+        /// PUT /api/inventory/{id} — Update stock quantity (staff: qty only, admin: qty + reorder)
         /// </summary>
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateStock(int id, [FromBody] UpdateStockDto dto)
@@ -51,9 +51,14 @@ namespace GreenLeafTeaAPI.Controllers
             var inventory = await _context.Inventories.FindAsync(id);
             if (inventory == null) return NotFound(new { message = "Inventory record not found." });
 
+            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
             inventory.QuantityKg = dto.QuantityKg;
-            if (dto.ReorderLevelKg.HasValue)
+
+            // Only Admin can change reorder levels
+            if (dto.ReorderLevelKg.HasValue && role == "Admin")
                 inventory.ReorderLevelKg = dto.ReorderLevelKg.Value;
+
             inventory.LastUpdated = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();

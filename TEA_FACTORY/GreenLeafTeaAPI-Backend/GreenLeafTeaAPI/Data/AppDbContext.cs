@@ -170,7 +170,7 @@ namespace GreenLeafTeaAPI.Data
                 entity.Property(m => m.Message).IsRequired().HasMaxLength(2000);
             });
 
-            // Quote Request (existing)
+            // Quote Request (enhanced with QuotedAmount)
             modelBuilder.Entity<QuoteRequest>(entity =>
             {
                 entity.Property(q => q.CustomerName).IsRequired().HasMaxLength(100);
@@ -179,6 +179,7 @@ namespace GreenLeafTeaAPI.Data
                 entity.Property(q => q.Phone).HasMaxLength(20);
                 entity.Property(q => q.Status).HasMaxLength(50);
                 entity.Property(q => q.AdminNotes).HasMaxLength(500);
+                entity.Property(q => q.QuotedAmount).HasPrecision(12, 2);
             });
 
             // =============================================

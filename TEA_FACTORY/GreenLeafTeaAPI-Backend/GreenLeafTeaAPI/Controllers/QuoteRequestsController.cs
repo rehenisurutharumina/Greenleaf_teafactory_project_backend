@@ -1,6 +1,7 @@
 using GreenLeafTeaAPI.Data;
 using GreenLeafTeaAPI.DTOs;
 using GreenLeafTeaAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -66,6 +67,7 @@ namespace GreenLeafTeaAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<QuoteRequestDto>>> GetAllQuotes()
         {
             var quotes = await _context.QuoteRequests
@@ -78,6 +80,7 @@ namespace GreenLeafTeaAPI.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<QuoteRequestDto>> GetQuote(int id)
         {
             var quote = await _context.QuoteRequests
@@ -92,6 +95,31 @@ namespace GreenLeafTeaAPI.Controllers
             return Ok(ToDto(quote));
         }
 
+        /// <summary>
+        /// PUT /api/quoterequests/{id}/status — Admin: update quote status, notes, and amount
+        /// </summary>
+        [HttpPut("{id:int}/status")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateQuoteStatus(int id, [FromBody] UpdateQuoteStatusDto dto)
+        {
+            var quote = await _context.QuoteRequests.FindAsync(id);
+            if (quote == null)
+                return NotFound(new { message = $"Quote request #{id} not found." });
+
+            if (!string.IsNullOrWhiteSpace(dto.Status))
+                quote.Status = dto.Status.Trim();
+
+            if (dto.AdminNotes != null)
+                quote.AdminNotes = dto.AdminNotes.Trim();
+
+            if (dto.QuotedAmount.HasValue)
+                quote.QuotedAmount = dto.QuotedAmount.Value;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = $"Quote #{id} updated to '{quote.Status}'." });
+        }
+
         private static QuoteRequestDto ToDto(QuoteRequest quote)
         {
             return new QuoteRequestDto
@@ -103,6 +131,8 @@ namespace GreenLeafTeaAPI.Controllers
                 Email = quote.Email,
                 Phone = quote.Phone,
                 Status = quote.Status,
+                AdminNotes = quote.AdminNotes,
+                QuotedAmount = quote.QuotedAmount,
                 SubmittedAt = quote.SubmittedAt
             };
         }

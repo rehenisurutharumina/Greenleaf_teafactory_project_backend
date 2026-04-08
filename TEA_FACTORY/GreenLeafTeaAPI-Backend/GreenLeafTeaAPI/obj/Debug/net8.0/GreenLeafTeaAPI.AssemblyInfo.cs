@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GreenLeafTeaAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f6353150c905f219e570821ab7e448f545ceb730")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2608260c68a95a914f1f8a12d4ca724c77ac0262")]
 [assembly: System.Reflection.AssemblyProductAttribute("GreenLeafTeaAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GreenLeafTeaAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

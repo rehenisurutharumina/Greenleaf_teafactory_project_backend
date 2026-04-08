@@ -1,4 +1,5 @@
 using GreenLeafTeaAPI.Data;
+using GreenLeafTeaAPI.Middleware;
 using GreenLeafTeaAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -42,11 +43,30 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // ============================================================
 // 4. JWT Authentication
+//    Priority: Environment variable → appsettings.json → fail
 // ============================================================
-var jwtKey = builder.Configuration["Jwt:Key"]
-    ?? throw new InvalidOperationException("Jwt:Key is missing in appsettings.json.");
+var jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
+    ?? builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException(
+        "JWT secret key is not configured. Set the JWT_SECRET_KEY environment variable or Jwt:Key in appsettings.json.");
+
+if (jwtKey.Length < 32)
+{
+    throw new InvalidOperationException("JWT secret key must be at least 32 characters long.");
+}
+
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "GreenLeafTeaAPI";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "GreenLeafTeaFrontend";
+var jwtExpiryHours = builder.Configuration.GetValue<int>("Jwt:ExpiryHours", 24);
+
+// Store JWT settings for TokenService to reuse
+builder.Services.AddSingleton(new JwtSettings
+{
+    Key = jwtKey,
+    Issuer = jwtIssuer,
+    Audience = jwtAudience,
+    ExpiryHours = jwtExpiryHours
+});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -63,7 +83,28 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtAudience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ClockSkew = TimeSpan.FromMinutes(1) // Tighten default 5-min skew
+    };
+
+    // Return consistent JSON for auth failures instead of empty 401/403
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = context =>
+        {
+            context.HandleResponse();
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.ContentType = "application/json";
+            var result = JsonSerializer.Serialize(new { message = "Authentication required. Please log in." });
+            return context.Response.WriteAsync(result);
+        },
+        OnForbidden = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            context.Response.ContentType = "application/json";
+            var result = JsonSerializer.Serialize(new { message = "You do not have permission to access this resource." });
+            return context.Response.WriteAsync(result);
+        }
     };
 });
 
@@ -103,6 +144,13 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var webRootPath = builder.Environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+if (!Directory.Exists(webRootPath))
+{
+    Directory.CreateDirectory(webRootPath);
+}
+builder.Environment.WebRootPath = webRootPath;
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -123,12 +171,17 @@ using (var scope = app.Services.CreateScope())
 // ============================================================
 // 9. Middleware pipeline
 // ============================================================
+
+// Global exception handler — catches all unhandled exceptions
+app.UseGlobalExceptionHandler();
+
 // Only redirect to HTTPS in production (in dev, frontend uses HTTP)
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
 
+app.UseStaticFiles();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();   // Must come before Authorization
 app.UseAuthorization();

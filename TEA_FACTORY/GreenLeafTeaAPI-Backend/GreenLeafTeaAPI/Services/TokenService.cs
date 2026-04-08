@@ -8,25 +8,20 @@ namespace GreenLeafTeaAPI.Services
 {
     public class TokenService
     {
-        private readonly IConfiguration _config;
+        private readonly JwtSettings _settings;
 
-        public TokenService(IConfiguration config)
+        public TokenService(JwtSettings settings)
         {
-            _config = config;
+            _settings = settings;
         }
 
         /// <summary>
-        /// Generates a JWT token containing user ID, email, and role claims.
-        /// Token is valid for 24 hours.
+        /// Generates a JWT token containing user ID, email, full name, and role claims.
+        /// Expiry is configurable via JwtSettings.ExpiryHours (default: 24 hours).
         /// </summary>
         public string GenerateToken(User user)
         {
-            var jwtKey = _config["Jwt:Key"]
-                ?? throw new InvalidOperationException("JWT Key is not configured.");
-            var issuer = _config["Jwt:Issuer"] ?? "GreenLeafTeaAPI";
-            var audience = _config["Jwt:Audience"] ?? "GreenLeafTeaFrontend";
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -38,10 +33,10 @@ namespace GreenLeafTeaAPI.Services
             };
 
             var token = new JwtSecurityToken(
-                issuer: issuer,
-                audience: audience,
+                issuer: _settings.Issuer,
+                audience: _settings.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(24),
+                expires: DateTime.UtcNow.AddHours(_settings.ExpiryHours),
                 signingCredentials: credentials
             );
 

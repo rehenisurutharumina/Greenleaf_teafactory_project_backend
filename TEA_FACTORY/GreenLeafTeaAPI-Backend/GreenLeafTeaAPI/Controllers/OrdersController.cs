@@ -1,4 +1,5 @@
 using GreenLeafTeaAPI.Data;
+using GreenLeafTeaAPI.DTOs;
 using GreenLeafTeaAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -210,18 +211,5 @@ namespace GreenLeafTeaAPI.Controllers
             var claim = User.FindFirst(ClaimTypes.NameIdentifier);
             return claim != null && int.TryParse(claim.Value, out var id) ? id : null;
         }
-    }
-
-    // ---- DTOs ----
-    public class PlaceOrderDto
-    {
-        public string? ShippingAddress { get; set; }
-        public string? PaymentMethod { get; set; }
-    }
-
-    public class UpdateOrderStatusDto
-    {
-        public string Status { get; set; } = string.Empty;
-        public string? PaymentStatus { get; set; }
     }
 }

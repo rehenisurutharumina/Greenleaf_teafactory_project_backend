@@ -8,7 +8,6 @@ namespace GreenLeafTeaAPI.DTOs
 {
     // ----------------------------------------------------------
     // QuoteRequestDto — Response DTO
-    // Sent back to the client after saving a quote request.
     // ----------------------------------------------------------
     public class QuoteRequestDto
     {
@@ -19,17 +18,27 @@ namespace GreenLeafTeaAPI.DTOs
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string Status { get; set; } = "Pending";
+        public string? AdminNotes { get; set; }
+        public decimal? QuotedAmount { get; set; }
         public DateTime SubmittedAt { get; set; }
     }
 
     // ----------------------------------------------------------
-    // CreateQuoteRequestDto — Request DTO
-    // This is the shape of data the frontend POSTS when
-    // the visitor submits the "Get a Quick Quote" form.
-    //
-    // Validation rules here are checked automatically by
-    // ASP.NET Core before your controller code even runs.
-    // If validation fails, it returns a 400 Bad Request.
+    // UpdateQuoteStatusDto — Admin updates quote status
+    // ----------------------------------------------------------
+    public class UpdateQuoteStatusDto
+    {
+        [MaxLength(50)]
+        public string Status { get; set; } = string.Empty;
+
+        [MaxLength(500)]
+        public string? AdminNotes { get; set; }
+
+        public decimal? QuotedAmount { get; set; }
+    }
+
+    // ----------------------------------------------------------
+    // CreateQuoteRequestDto — Request DTO for submitting quotes
     // ----------------------------------------------------------
     public class CreateQuoteRequestDto
     {
@@ -47,7 +56,6 @@ namespace GreenLeafTeaAPI.DTOs
         [Range(1, 100000, ErrorMessage = "Quantity must be between 1 and 100,000 kg.")]
         public int QuantityKg { get; set; }
 
-        // Email is optional but must be valid format if provided
         [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
         [MaxLength(150)]
         public string? Email { get; set; }
