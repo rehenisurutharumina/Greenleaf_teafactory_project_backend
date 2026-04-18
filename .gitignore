@@ -1,0 +1,30 @@
+## .NET build outputs
+bin/
+obj/
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## IDE
+.vs/
+.vscode/
+*.swp
+*~
+
+## Secrets (real credentials for local dev)
+appsettings.Development.json
+
+## OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+## Build logs
+*.log
+build_output.txt
+
+## NuGet
+*.nupkg
